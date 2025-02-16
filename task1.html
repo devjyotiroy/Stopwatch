@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature-Rich Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #87CEEB, #4682B4);
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
+        .stopwatch {
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 400px;
+        }
+        .time {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        button {
+            margin: 8px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .start-stop {
+            background-color: #28a745;
+            color: white;
+        }
+        .reset {
+            background-color: #dc3545;
+            color: white;
+        }
+        .lap {
+            background-color: #007bff;
+            color: white;
+        }
+        .clear-laps {
+            background-color: #ff8c00;
+            color: white;
+        }
+        .mode-toggle {
+            background-color: #6c757d;
+            color: white;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .dark-mode .stopwatch {
+            background: #333;
+            color: white;
+        }
+        .dark-mode button {
+            color: white;
+        }
+        .dark-mode .time {
+            color: #FFD700;
+        }
+        #laps {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+        }
+        .lap-item {
+            padding: 5px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time" id="display">00:00:00.000</div>
+        <button class="start-stop" onclick="startStop()">Start</button>
+        <button class="reset" onclick="reset()">Reset</button>
+        <button class="lap" onclick="lap()">Lap</button>
+        <button class="clear-laps" onclick="clearLaps()">Clear Laps</button>
+        <button class="mode-toggle" onclick="toggleTheme()">Dark Mode</button>
+        <ul id="laps"></ul>
+    </div>
+
+    <script>
+        let timer;
+        let running = false;
+        let elapsed = 0;
+        let laps = [];
+        let startTime;
+
+        function startStop() {
+            let button = document.querySelector(".start-stop");
+            if (running) {
+                clearInterval(timer);
+                button.innerText = "Start";
+                button.style.backgroundColor = "#28a745";
+            } else {
+                startTime = Date.now() - elapsed;
+                timer = setInterval(() => {
+                    elapsed = Date.now() - startTime;
+                    document.getElementById('display').innerText = formatTime(elapsed);
+                }, 10);
+                button.innerText = "Stop";
+                button.style.backgroundColor = "#dc3545";
+            }
+            running = !running;
+        }
+
+        function reset() {
+            clearInterval(timer);
+            running = false;
+            elapsed = 0;
+            document.getElementById('display').innerText = "00:00:00.000";
+            document.getElementById('laps').innerHTML = "";
+            let button = document.querySelector(".start-stop");
+            button.innerText = "Start";
+            button.style.backgroundColor = "#28a745";
+        }
+
+        function lap() {
+            if (running) {
+                laps.push(formatTime(elapsed));
+                let lapItem = document.createElement("li");
+                lapItem.className = "lap-item";
+                lapItem.innerText = laps.length + ". " + formatTime(elapsed);
+                document.getElementById('laps').appendChild(lapItem);
+            }
+        }
+
+        function clearLaps() {
+            document.getElementById('laps').innerHTML = "";
+            laps = [];
+        }
+
+        function formatTime(ms) {
+            let date = new Date(ms);
+            return date.toISOString().substr(11, 12);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            let button = document.querySelector(".mode-toggle");
+            if (document.body.classList.contains("dark-mode")) {
+                button.innerText = "Light Mode";
+            } else {
+                button.innerText = "Dark Mode";
+            }
+        }
+    </script>
+</body>
+</html>
